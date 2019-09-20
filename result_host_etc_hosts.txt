@@ -1,0 +1,10 @@
+192.168.100.36  pavel-centos7-1  # VAGRANT: 36e6fe8ae77b4348e2e91ba1f21077f6 (node-centos-1) / f38126dd-d3bb-496c-be9c-083e0cb312e9
+
+## vagrant-hostmanager-start id: 3869c800-1ef4-4711-aa11-74cd5463de1f
+192.168.100.37	pavel-centos7-2
+
+192.168.100.36	pavel-centos7-1
+
+## vagrant-hostmanager-end
+
+192.168.100.37  pavel-centos7-2  # VAGRANT: a1f3dc566eb79d1b2a69b073546ae6fe (node-centos-2) / cb9a48f2-6191-4c90-ba72-5e0cf4d85cf3

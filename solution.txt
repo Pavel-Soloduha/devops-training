@@ -4,3 +4,9 @@
 - для настройки секьюрного ssh
   sshd -4 -o PermitRootLogin=no -o Port 25
   ну или ручками локально покрутить /etc/ssh/sshd_config и потом его пихнуть в виртуалки
+  
+- операция копирования с параметрами это
+  cp --preserve from to
+  а как это на scp натянуть не знаю
+- создание архива
+  tar cfz arch.tar directory-to-archive

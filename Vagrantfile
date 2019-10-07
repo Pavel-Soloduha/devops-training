@@ -4,10 +4,23 @@
 $install_git = <<-SCRIPT
     sudo yum install git -y
     git --version
-    git clone https://github.com/Pavel-Soloduha/devops-training.git
-    cd devops-training
-    git checkout module2
-    cat hometask.txt
+    sudo yum remove docker \
+        docker-client \
+        docker-client-latest \
+        docker-common \
+        docker-latest \
+        docker-latest-logrotate \
+        docker-logrotate \
+        docker-engine -y
+    sudo yum install -y yum-utils \
+        device-mapper-persistent-data \
+        lvm2
+    sudo yum-config-manager \
+        --add-repo \
+        https://download.docker.com/linux/centos/docker-ce.repo
+    sudo yum update -y
+    sudo yum install -y docker-ce docker-ce-cli containerd.io
+    sudo docker version
 SCRIPT
 
 Vagrant.configure("2") do |config|

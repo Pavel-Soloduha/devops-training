@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
     config.hostmanager.manage_host = true
     config.hostmanager.manage_guest = true
 
-    (1..3).each do |i|
+    (1..1).each do |i|
         config.vm.define "node-centos-#{i}" do |node|
         node.vm.box = "centos/7"
         node.vm.box_version = "1905.1"

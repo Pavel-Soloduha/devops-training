@@ -2,26 +2,39 @@
 # vi: set ft=ruby :
 
 $install_git = <<-SCRIPT
-    sudo yum install git -y
+    yum install -y git nano
     git --version
-    sudo yum remove docker \
+    yum remove -y docker \
         docker-client \
         docker-client-latest \
         docker-common \
         docker-latest \
         docker-latest-logrotate \
         docker-logrotate \
-        docker-engine -y
-    sudo yum install -y yum-utils \
+        docker-engine
+    yum install -y yum-utils \
         device-mapper-persistent-data \
         lvm2
-    sudo yum-config-manager \
+    yum-config-manager \
         --add-repo \
         https://download.docker.com/linux/centos/docker-ce.repo
-    sudo yum update -y
-    sudo yum install -y docker-ce docker-ce-cli containerd.io
-    sudo docker version
+    yum update -y
+    yum install -y docker-ce docker-ce-cli containerd.io
+    systemctl enable docker.service
+    systemctl start docker.service
+    docker version
+
+    groupadd module3-group
+    useradd module3-user
+    usermod -aG module3-group module3-user
+    groups module3-user
+    groupdel module3-group
+    groups module3-user
+
+    yum install -y ntp
 SCRIPT
+# добавить в /etc/sudoers строчку
+# module3-user ALL= NOPASSWD: /bin/systemctl restart docker.service
 
 Vagrant.configure("2") do |config|
 
@@ -29,7 +42,7 @@ Vagrant.configure("2") do |config|
     config.hostmanager.manage_host = true
     config.hostmanager.manage_guest = true
 
-    (1..2).each do |i|
+    (1..1).each do |i|
         config.vm.define "node-centos-#{i}" do |node|
         node.vm.box = "centos/7"
         node.vm.box_version = "1905.1"

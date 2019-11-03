@@ -88,7 +88,7 @@ resource "aws_route_table" "private-rt" {
 resource "aws_instance" "NAT" {
 
   ami           = "ami-21f6dc44"
-  instance_type = "t2.micro"
+  instance_type = "t2.nano"
   subnet_id     = "${aws_subnet.private-backend-a.id}"
 
   tags = {
@@ -98,12 +98,12 @@ resource "aws_instance" "NAT" {
   }
 }
 
-resource "aws_eip" "lb" {
+resource "aws_eip" "nat-eip-a" {
   instance = "${aws_instance.NAT.id}"
   vpc      = true
 
   tags = {
-    Name     = "NAT ip"
+    Name     = "NAT ip a"
     provider = var.tag-provider
     AZ       = var.AZ["A"]
   }
@@ -140,5 +140,83 @@ resource "aws_internet_gateway" "gw" {
   tags = {
     Name     = "gateway"
     provider = var.tag-provider
+  }
+}
+
+//Nginx instance
+resource "aws_instance" "nginx-a" {
+
+  ami           = "ami-0d03add87774b12c5"
+  instance_type = "t2.nano"
+  subnet_id     = "${aws_subnet.public-a.id}"
+
+  tags = {
+    Name     = "nginx-a"
+    provider = var.tag-provider
+    AZ       = var.AZ["A"]
+  }
+}
+
+resource "aws_eip" "nginx-eip-a" {
+  depends_on = ["aws_instance.nginx-a"]
+  instance   = "${aws_instance.nginx-a.id}"
+  vpc        = true
+
+  tags = {
+    Name     = "Nginx ip a"
+    provider = var.tag-provider
+    AZ       = var.AZ["A"]
+  }
+}
+
+//CMS
+resource "aws_instance" "cms-a" {
+  ami           = "ami-0d03add87774b12c5"
+  instance_type = "t2.nano"
+  subnet_id     = "${aws_subnet.private-backend-a.id}"
+
+  tags = {
+    Name     = "CMS-a"
+    provider = var.tag-provider
+    AZ       = var.AZ["A"]
+  }
+}
+
+//MySQL
+resource "aws_instance" "mysql-a" {
+  ami           = "ami-0d03add87774b12c5"
+  instance_type = "t2.nano"
+  subnet_id     = "${aws_subnet.private-db-a.id}"
+
+  tags = {
+    Name     = "MySQL-a"
+    provider = var.tag-provider
+    AZ       = var.AZ["A"]
+  }
+}
+
+//Bastion
+resource "aws_instance" "bastion" {
+
+  ami           = "ami-0d03add87774b12c5"
+  instance_type = "t2.nano"
+  subnet_id     = "${aws_subnet.public-a.id}"
+
+  tags = {
+    Name     = "Bastion"
+    provider = var.tag-provider
+    AZ       = var.AZ["A"]
+  }
+}
+
+resource "aws_eip" "bastion-eip-a" {
+  depends_on = ["aws_instance.bastion"]
+  instance   = "${aws_instance.bastion.id}"
+  vpc        = true
+
+  tags = {
+    Name     = "Bastion ip"
+    provider = var.tag-provider
+    AZ       = var.AZ["A"]
   }
 }

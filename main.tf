@@ -64,7 +64,7 @@ resource "aws_default_route_table" "default-rt" {
 
 //PrivateRT
 resource "aws_route_table_association" "private-rt-route-a" {
-    depends_on = ["aws_route_table.private-rt"]
+  depends_on     = ["aws_route_table.private-rt"]
   subnet_id      = "${aws_subnet.private-backend-a.id}"
   route_table_id = "${aws_route_table.private-rt.id}"
 }
@@ -113,7 +113,7 @@ resource "aws_eip" "lb" {
 //PublicRT
 //need Internet gateway
 resource "aws_route_table_association" "public-rt-route-a" {
-    depends_on = ["aws_route_table.public-rt"]
+  depends_on     = ["aws_route_table.public-rt"]
   subnet_id      = "${aws_subnet.public-a.id}"
   route_table_id = "${aws_route_table.public-rt.id}"
 }

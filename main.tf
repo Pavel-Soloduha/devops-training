@@ -159,6 +159,11 @@ resource "aws_instance" "nginx-a" {
   subnet_id              = "${aws_subnet.public-a.id}"
   key_name               = "amazon-key"
   vpc_security_group_ids = ["${aws_security_group.allow-inbound.id}", "${aws_security_group.allow-vpc-traffic.id}"]
+  user_data              = <<EOF
+                          #!/bin/bash
+                          sudo -i
+                          apt update && apt install -y nginx
+                          EOF
 
   tags = {
     Name     = "nginx-a"
@@ -186,6 +191,14 @@ resource "aws_instance" "cms-a" {
   subnet_id              = "${aws_subnet.private-backend-a.id}"
   key_name               = "amazon-key"
   vpc_security_group_ids = ["${aws_security_group.allow-vpc-traffic.id}"]
+  user_data              = <<EOF
+                            #!/bin/bash
+                            sudo -i
+                            apt-get install -y software-properties-common
+                            add-apt-repository -y ppa:ondrej/php
+                            apt-get update
+                            apt-get install -y php7.3
+                            EOF
 
   tags = {
     Name     = "CMS-a"

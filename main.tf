@@ -88,12 +88,16 @@ resource "aws_route_table" "private-rt" {
 //still need iptables -t nat -A POSTROUTING -s 10.0.0.64/27 -o eth0 -j MASQUERADE
 //and sed /etc/systcl.conf to enable ip_forwarding
 resource "aws_instance" "NAT" {
-  ami                    = "ami-00d1f8201864cc10c"
+  ami                    = "ami-0c1e4eef06f6e6740"
   instance_type          = "t2.nano"
   subnet_id              = "${aws_subnet.public-a.id}"
   key_name               = "amazon-key"
   vpc_security_group_ids = ["${aws_security_group.allow-inbound.id}", "${aws_security_group.allow-vpc-traffic.id}"]
   source_dest_check      = "false"
+  user_data              = <<EOF
+                          #!/bin/bash
+                          sysctl -q -w net.ipv4.ip_forward=1 && iptables -t nat -F && iptables -t nat -A POSTROUTING -o eth0 -s 10.0.0.64/27 -j MASQUERADE
+                          EOF
 
   tags = {
     Name     = "NAT"

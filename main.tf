@@ -63,9 +63,15 @@ resource "aws_default_route_table" "default-rt" {
 }
 
 //PrivateRT
-resource "aws_route_table_association" "private-rt-route-a" {
+resource "aws_route_table_association" "private-rt-route-pb-a" {
   depends_on     = ["aws_route_table.private-rt"]
   subnet_id      = "${aws_subnet.private-backend-a.id}"
+  route_table_id = "${aws_route_table.private-rt.id}"
+}
+
+resource "aws_route_table_association" "private-rt-route-pdb-a" {
+  depends_on     = ["aws_route_table.private-rt"]
+  subnet_id      = "${aws_subnet.private-db-a.id}"
   route_table_id = "${aws_route_table.private-rt.id}"
 }
 
@@ -96,7 +102,7 @@ resource "aws_instance" "NAT" {
   source_dest_check      = "false"
   user_data              = <<EOF
                           #!/bin/bash
-                          sysctl -q -w net.ipv4.ip_forward=1 && iptables -t nat -F && iptables -t nat -A POSTROUTING -o eth0 -s 10.0.0.64/27 -j MASQUERADE
+                          sysctl -q -w net.ipv4.ip_forward=1 && iptables -t nat -F && iptables -t nat -A POSTROUTING -o eth0 -s 10.0.0.64/27 -j MASQUERADE && iptables -t nat -A POSTROUTING -o eth0 -s 10.0.0.32/27 -j MASQUERADE
                           EOF
 
   tags = {
@@ -161,7 +167,6 @@ resource "aws_instance" "nginx-a" {
   vpc_security_group_ids = ["${aws_security_group.allow-inbound.id}", "${aws_security_group.allow-vpc-traffic.id}"]
   user_data              = <<EOF
                           #!/bin/bash
-                          sudo -i
                           apt update && apt install -y nginx
                           EOF
 
@@ -193,11 +198,7 @@ resource "aws_instance" "cms-a" {
   vpc_security_group_ids = ["${aws_security_group.allow-vpc-traffic.id}"]
   user_data              = <<EOF
                             #!/bin/bash
-                            sudo -i
-                            apt-get install -y software-properties-common
-                            add-apt-repository -y ppa:ondrej/php
-                            apt-get update
-                            apt-get install -y php7.3
+                            apt-get install -y software-properties-common && add-apt-repository -y ppa:ondrej/php && apt-get update && apt-get install -y php7.3
                             EOF
 
   tags = {

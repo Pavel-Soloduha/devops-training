@@ -21,6 +21,15 @@ module "security-groups" {
   tag_provider = var.tag-provider
 }
 
+module "network" {
+  source = "./network"
+
+  vpc_id                         = aws_vpc.vpc.id
+  tag_provider                   = var.tag-provider
+  aval_zone_count                = 1
+  sec_group_id_allow_inbound     = module.security-groups.sec_group_id_allow_inboud
+  sec_group_id_allow_vpc_traffic = module.security-groups.sec_group_id_allow_vpc_traffic
+}
 
 ////Nginx instance
 //resource "aws_instance" "nginx-a" {

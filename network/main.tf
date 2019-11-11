@@ -24,4 +24,9 @@ module "route_tables" {
   tag_provider    = var.tag_provider
   vpc_id          = var.vpc_id
   aval_zone_count = var.aval_zone_count
+
+  subnet_id_private_db_a      = module.subnets.subnet_id_private_db_a
+  subnet_id_private_backend_a = module.subnets.subnet_id_private_backend_a
+  subnet_id_public_a          = module.subnets.subnet_id_public_a
+  nat_id                      = module.nat.nat_id
 }

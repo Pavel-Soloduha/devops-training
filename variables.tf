@@ -2,7 +2,7 @@ variable "region" {
   default = "us-east-2"
 }
 
-variable "tag-provider" {
+variable "tag_provider" {
   default = "terraform"
 }
 

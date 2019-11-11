@@ -10,7 +10,7 @@ resource "aws_vpc" "vpc" {
 
   tags = {
     Name     = "vpc"
-    provider = var.tag-provider
+    provider = var.tag_provider
   }
 }
 
@@ -18,50 +18,29 @@ module "security-groups" {
   source = "./security-groups"
 
   vpc_id       = aws_vpc.vpc.id
-  tag_provider = var.tag-provider
+  tag_provider = var.tag_provider
 }
 
 module "network" {
   source = "./network"
 
   vpc_id                         = aws_vpc.vpc.id
-  tag_provider                   = var.tag-provider
+  tag_provider                   = var.tag_provider
   aval_zone_count                = 1
   sec_group_id_allow_inbound     = module.security-groups.sec_group_id_allow_inboud
   sec_group_id_allow_vpc_traffic = module.security-groups.sec_group_id_allow_vpc_traffic
 }
 
-////Nginx instance
-//resource "aws_instance" "nginx-a" {
-//
-//  ami                    = "ami-0d03add87774b12c5"
-//  instance_type          = "t2.nano"
-//  subnet_id              = "${aws_subnet.public-a.id}"
-//  key_name               = "amazon-key"
-//  vpc_security_group_ids = ["${aws_security_group.allow-inbound.id}", "${aws_security_group.allow-vpc-traffic.id}"]
-//  user_data              = <<EOF
-//                          #!/bin/bash
-//                          apt update && apt install -y nginx
-//                          EOF
-//
-//  tags = {
-//    Name     = "nginx-a"
-//    provider = var.tag-provider
-//    AZ       = var.AZ["A"]
-//  }
-//}
-//
-//resource "aws_eip" "nginx-eip-a" {
-//  depends_on = ["aws_instance.nginx-a"]
-//  instance   = "${aws_instance.nginx-a.id}"
-//  vpc        = true
-//
-//  tags = {
-//    Name     = "Nginx ip a"
-//    provider = var.tag-provider
-//    AZ       = var.AZ["A"]
-//  }
-//}
+module "instances" {
+  source = "./instances"
+
+  sec_group_id_allow_inbound     = module.security-groups.sec_group_id_allow_inboud
+  sec_group_id_allow_vpc_traffic = module.security-groups.sec_group_id_allow_inboud
+  subnet_id_public_a             = module.network.subnet_id_public_a
+  tag_provider                   = var.tag_provider
+}
+
+
 //
 ////CMS
 //resource "aws_instance" "cms-a" {

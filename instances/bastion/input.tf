@@ -1,4 +1,9 @@
-variable "subnet_id_private_db_a" {
+variable "subnet_id_public_a" {
+  type        = string
+  description = "subnet id"
+}
+
+variable "sec_group_id_allow_ssh" {
   type = string
 }
 

@@ -13,7 +13,7 @@ variable "aval_zone_count" {
   description = "Amount of avalability zones work with"
 }
 
-variable "subnet_id" {
+variable "subnet_id_public_a" {
   type        = string
   description = "subnet id for NAT instance"
 }

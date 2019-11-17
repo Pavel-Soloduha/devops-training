@@ -1,46 +1,58 @@
-//resource "aws_subnet" "private_db_a" {
-//  vpc_id            = data.aws_vpc.vpc_data.id
-//  cidr_block        = "10.0.0.32/27"
-//  availability_zone = "us-east-2a"
-//
-//  tags = {
-//    Name     = "PrivateDB-A"
-//    provider = var.tag_provider
-//    AZ       = "us-east-2a"
-//  }
-//}
-//
-//resource "aws_route_table" "private_rt" {
-//  vpc_id = data.aws_vpc.vpc_data.id
-//
-//  route {
-//    cidr_block  = "0.0.0.0/0"
-//    instance_id = aws_instance.nat.id
-//  }
-//
-//  tags = {
-//    Name     = "PrivateRT"
-//    provider = var.tag_provider
-//    AZ       = "us-east-2a"
-//  }
-//}
-//
-//resource "aws_route_table_association" "private-rt-route-pdb-a" {
-//  subnet_id      = aws_subnet.private_db_a.id
-//  route_table_id = aws_route_table.private_rt.id
-//}
-//
-//resource "aws_instance" "mysql-a" {
-//  ami                    = "ami-03553f266eaffafec"
-//  instance_type          = "t2.nano"
-//  subnet_id              = aws_subnet.private_db_a.id
-//  key_name               = "amazon-key"
-//  vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id]
-//
-//  tags = {
-//    Name     = "mysql-a"
-//    provider = var.tag_provider
-//    AZ       = "us-east-2a"
-//  }
-//}
-//
+locals {
+  private_subnet_count = var.max_subnet_count == 0 ? length(data.aws_availability_zones.zones.names) : var.max_subnet_count
+}
+
+resource "aws_subnet" "private_db" {
+  count  = local.private_subnet_count
+  vpc_id = data.aws_vpc.vpc_data.id
+  cidr_block = cidrsubnet(
+    signum(length(var.cidr)) == 1 ? var.cidr : data.aws_vpc.vpc_data.cidr_block,
+    ceil(log(local.private_subnet_count * var.network_layers_count, 2)),
+    count.index + local.backend_subnet_count + local.backend_subnet_count
+  )
+  availability_zone = element(data.aws_availability_zones.zones.names, count.index)
+
+  tags = {
+    Name     = "PrivateDB"
+    provider = var.tag_provider
+    AZ       = element(data.aws_availability_zones.zones.names, count.index)
+  }
+}
+
+resource "aws_route_table" "private_rt" {
+  count  = local.private_subnet_count
+  vpc_id = data.aws_vpc.vpc_data.id
+
+  route {
+    cidr_block  = "0.0.0.0/0"
+    instance_id = element(aws_instance.nat.*.id, count.index)
+  }
+
+  tags = {
+    Name     = "PrivateRT"
+    provider = var.tag_provider
+    AZ       = element(data.aws_availability_zones.zones.names, count.index)
+  }
+}
+
+resource "aws_route_table_association" "private_rt_route_db" {
+  count          = local.private_subnet_count
+  subnet_id      = element(aws_subnet.private_db.*.id, count.index)
+  route_table_id = element(aws_route_table.private_rt.*.id, count.index)
+}
+
+resource "aws_instance" "mysql" {
+  count                  = local.private_subnet_count
+  ami                    = "ami-0d03add87774b12c5"
+  instance_type          = "t2.nano"
+  subnet_id              = element(aws_subnet.private_db.*.id, count.index)
+  key_name               = "amazon-key"
+  vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id]
+
+  tags = {
+    Name     = "mysql"
+    provider = var.tag_provider
+    AZ       = element(data.aws_availability_zones.zones.names, count.index)
+  }
+}
+

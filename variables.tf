@@ -23,3 +23,8 @@ variable "AZ" {
     "B" = "us-east-2b"
   }
 }
+
+variable "network_layers_count" {
+  type    = number
+  default = 3
+}

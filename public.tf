@@ -7,7 +7,7 @@ resource "aws_subnet" "public" {
   vpc_id = data.aws_vpc.vpc_data.id
   cidr_block = cidrsubnet(
     signum(length(var.cidr)) == 1 ? var.cidr : data.aws_vpc.vpc_data.cidr_block,
-    ceil(log(local.public_subnet_count * 2, 2)),
+    ceil(log(local.public_subnet_count * var.network_layers_count, 2)),
     count.index
   )
   availability_zone = element(data.aws_availability_zones.zones.names, count.index)

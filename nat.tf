@@ -8,7 +8,10 @@ resource "aws_instance" "nat" {
   source_dest_check      = "false"
   user_data              = <<EOF
                           #!/bin/bash
-                          sysctl -q -w net.ipv4.ip_forward=1 && iptables -t nat -F && iptables -t nat -A POSTROUTING -o eth0 -s 10.0.0.64/27 -j MASQUERADE && iptables -t nat -A POSTROUTING -o eth0 -s 10.0.0.32/27 -j MASQUERADE
+                          sysctl -q -w net.ipv4.ip_forward=1 \
+                          iptables -t nat -F \
+                          iptables -t nat -A POSTROUTING -o eth0 -s "${element(aws_subnet.private_backend.*.id, count.index)}" -j MASQUERADE \
+                          iptables -t nat -A POSTROUTING -o eth0 -s "${element(aws_subnet.private_db.*.id, count.index)}" -j MASQUERADE
                           EOF
 
   tags = {

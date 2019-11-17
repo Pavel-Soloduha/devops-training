@@ -29,3 +29,18 @@ resource "aws_route_table_association" "private-rt-route-pdb-a" {
   subnet_id      = aws_subnet.private_db_a.id
   route_table_id = aws_route_table.private_rt.id
 }
+
+resource "aws_instance" "mysql-a" {
+  ami                    = "ami-03553f266eaffafec"
+  instance_type          = "t2.nano"
+  subnet_id              = aws_subnet.private_db_a.id
+  key_name               = "amazon-key"
+  vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id]
+
+  tags = {
+    Name     = "mysql-a"
+    provider = var.tag_provider
+    AZ       = "us-east-2a"
+  }
+}
+

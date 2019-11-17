@@ -2,9 +2,9 @@
 resource "aws_instance" "bastion" {
   ami                    = "ami-0d03add87774b12c5"
   instance_type          = "t2.nano"
-  subnet_id              = var.subnet_id_public_a
+  subnet_id              = aws_subnet.public_a.id
   key_name               = "amazon-key"
-  vpc_security_group_ids = [var.sec_group_id_allow_ssh, var.sec_group_id_allow_vpc_traffic]
+  vpc_security_group_ids = [aws_security_group.allow-ssh.id, aws_security_group.allow-vpc-traffic.id]
 
   tags = {
     Name     = "bastion"

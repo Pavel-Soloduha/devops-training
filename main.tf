@@ -6,7 +6,7 @@ provider "aws" {
 
 # Create a VPC
 resource "aws_vpc" "vpc" {
-  cidr_block = var.cidr["vpc"]
+  cidr_block = var.cidr
 
   tags = {
     Name     = "vpc"
@@ -18,5 +18,5 @@ data "aws_vpc" "vpc_data" {
   id = aws_vpc.vpc.id
 }
 
-data "aws_availability_zones" "aval_zones" {
+data "aws_availability_zones" "zones" {
 }

@@ -1,16 +1,26 @@
-resource "aws_subnet" "public_a" {
-  vpc_id            = data.aws_vpc.vpc_data.id
-  cidr_block        = "10.0.0.0/27"
-  availability_zone = "us-east-2a"
+locals {
+  public_subnet_count = var.max_subnet_count == 0 ? length(data.aws_availability_zones.zones.names) : var.max_subnet_count
+}
+
+resource "aws_subnet" "public" {
+  count  = local.public_subnet_count
+  vpc_id = data.aws_vpc.vpc_data.id
+  cidr_block = cidrsubnet(
+    signum(length(var.cidr)) == 1 ? var.cidr : data.aws_vpc.vpc_data.cidr_block,
+    ceil(log(local.public_subnet_count * 2, 2)),
+    count.index
+  )
+  availability_zone = element(data.aws_availability_zones.zones.names, count.index)
 
   tags = {
-    Name     = "Public-A"
+    Name     = "public"
     provider = var.tag_provider
-    AZ       = "us-east-2a"
+    AZ       = element(data.aws_availability_zones.zones.names, count.index)
   }
 }
 
-resource "aws_route_table" "public-rt" {
+resource "aws_route_table" "public_rt" {
+  count  = local.public_subnet_count
   vpc_id = data.aws_vpc.vpc_data.id
 
   route {
@@ -18,15 +28,16 @@ resource "aws_route_table" "public-rt" {
     gateway_id = aws_internet_gateway.gw.id
   }
   tags = {
-    Name     = "PublicRT"
+    Name     = "publicRT"
     provider = var.tag_provider
-    AZ       = "us-east-2a"
+    AZ       = element(data.aws_availability_zones.zones.names, count.index)
   }
 }
 
-resource "aws_route_table_association" "public-rt-route-a" {
-  subnet_id      = aws_subnet.public_a.id
-  route_table_id = aws_route_table.public-rt.id
+resource "aws_route_table_association" "public_rt_route" {
+  count          = local.public_subnet_count
+  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  route_table_id = element(aws_route_table.public_rt.*.id, count.index)
 }
 
 resource "aws_internet_gateway" "gw" {
@@ -38,10 +49,11 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
-resource "aws_instance" "nginx_a" {
+resource "aws_instance" "nginx" {
+  count                  = local.public_subnet_count
   ami                    = "ami-0d03add87774b12c5"
   instance_type          = "t2.nano"
-  subnet_id              = aws_subnet.public_a.id
+  subnet_id              = element(aws_subnet.public.*.id, count.index)
   key_name               = "amazon-key"
   vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id, aws_security_group.allow-inbound.id]
   user_data              = <<EOF
@@ -50,19 +62,20 @@ resource "aws_instance" "nginx_a" {
                           EOF
 
   tags = {
-    Name     = "nginx-a"
+    Name     = "nginx"
     provider = var.tag_provider
-    AZ       = "use-east-2a"
+    AZ       = element(data.aws_availability_zones.zones.names, count.index)
   }
 }
 
-resource "aws_eip" "nginx_eip_a" {
-  instance = aws_instance.nginx_a.id
+resource "aws_eip" "nginx_eip" {
+  count    = local.public_subnet_count
+  instance = element(aws_instance.nginx.*.id, count.index)
   vpc      = true
 
   tags = {
-    Name     = "Nginx ip a"
+    Name     = "nginx ip"
     provider = var.tag_provider
-    AZ       = "us-east-2a"
+    AZ       = element(data.aws_availability_zones.zones.names, count.index)
   }
 }

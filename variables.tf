@@ -6,14 +6,14 @@ variable "tag_provider" {
   default = "terraform"
 }
 
+variable "max_subnet_count" {
+  default = 2
+  type    = number
+}
+
 variable "cidr" {
-  type = "map"
-  default = {
-    "vpc"            = "10.0.0.0/24"
-    "subnet-pub-a"   = "10.0.0.0/27"
-    "subnet-pr-db-a" = "10.0.0.32/27"
-    "subnet-pr-bk-a" = "10.0.0.64/27"
-  }
+  type    = string
+  default = "10.0.0.0/24"
 }
 
 variable "AZ" {

@@ -1,9 +1,9 @@
 resource "aws_instance" "nat" {
   ami                    = "ami-0c1e4eef06f6e6740"
   instance_type          = "t2.nano"
-  subnet_id              = var.subnet_id_public_a
+  subnet_id              = aws_subnet.public_a.id
   key_name               = "amazon-key"
-  vpc_security_group_ids = [var.sec_group_id_allow_inbound, var.sec_group_id_allow_vpc_traffic]
+  vpc_security_group_ids = [aws_security_group.allow-inbound.id, aws_security_group.allow-vpc-traffic.id]
   source_dest_check      = "false"
   user_data              = <<EOF
                           #!/bin/bash

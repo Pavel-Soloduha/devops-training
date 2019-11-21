@@ -1,0 +1,10 @@
+#!/bin/bash
+apt update
+apt install software-properties-common nginx -y
+add-apt-repository universe
+add-apt-repository ppa:certbot/certbot
+apt update
+apt install certbot python-certbot-nginx python3-certbot-dns-cloudflare -y
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/cert.key -out /etc/nginx/certs/cert.crt
+
+mkdir /etc/nginx/certs

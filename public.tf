@@ -56,10 +56,12 @@ resource "aws_instance" "nginx" {
   subnet_id              = element(aws_subnet.public.*.id, count.index)
   key_name               = "amazon-key"
   vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id, aws_security_group.allow-inbound.id]
-  user_data              = <<EOF
-                          #!/bin/bash
-                          apt update && apt install -y nginx
-                          EOF
+  user_data              = file("nginx/nginx.setup")
+
+  provisioner "file" {
+    source      = "nginx/default.config"
+    destination = "/etc/nginx/conf.d/default.config"
+  }
 
   tags = {
     Name     = "nginx"

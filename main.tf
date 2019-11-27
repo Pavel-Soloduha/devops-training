@@ -8,10 +8,12 @@ provider "aws" {
 resource "aws_vpc" "vpc" {
   cidr_block = var.cidr
 
-  tags = {
-    Name     = "vpc"
-    provider = var.tag_provider
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "vpc-solodukha"
+    )
+  )
 }
 
 data "aws_vpc" "vpc_data" {

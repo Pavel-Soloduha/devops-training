@@ -12,11 +12,14 @@ resource "aws_subnet" "private_backend" {
   )
   availability_zone = element(data.aws_availability_zones.zones.names, count.index)
 
-  tags = {
-    Name     = "PrivateBackend"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
+
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "PrivateBackend",
+      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+    )
+  )
 }
 
 resource "aws_route_table_association" "private_rt_route_pb" {
@@ -27,15 +30,17 @@ resource "aws_route_table_association" "private_rt_route_pb" {
 
 resource "aws_instance" "cms" {
   count                  = local.backend_subnet_count
-  ami                    = "ami-0d03add87774b12c5"
+  ami                    = var.default_ami
   instance_type          = "t2.nano"
   subnet_id              = element(aws_subnet.private_backend.*.id, count.index)
-  key_name               = "amazon-key"
+  key_name               = var.access_key
   vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id]
 
-  tags = {
-    Name     = "cms"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "cms",
+      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+    )
+  )
 }

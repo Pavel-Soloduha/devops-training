@@ -12,11 +12,13 @@ resource "aws_subnet" "private_db" {
   )
   availability_zone = element(data.aws_availability_zones.zones.names, count.index)
 
-  tags = {
-    Name     = "PrivateDB"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "PrivateDB",
+      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+    )
+  )
 }
 
 resource "aws_route_table" "private_rt" {
@@ -28,11 +30,13 @@ resource "aws_route_table" "private_rt" {
     instance_id = element(aws_instance.nat.*.id, count.index)
   }
 
-  tags = {
-    Name     = "PrivateRT"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "PrivateRT",
+      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+    )
+  )
 }
 
 resource "aws_route_table_association" "private_rt_route_db" {
@@ -44,25 +48,18 @@ resource "aws_route_table_association" "private_rt_route_db" {
 resource "aws_instance" "mysql" {
   depends_on             = [aws_instance.nat]
   count                  = local.private_subnet_count
-  ami                    = "ami-0d03add87774b12c5"
+  ami                    = var.default_ami
   instance_type          = "t2.nano"
   subnet_id              = element(aws_subnet.private_db.*.id, count.index)
-  key_name               = "amazon-key"
+  key_name               = var.access_key
   vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id]
-  user_data              = <<EOF
-                          #!/bin/bash
-                          apt update
-                          apt install -y apt-transport-https ca-certificates curl software-properties-common
-                          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-                          add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-                          apt update
-                          apt-get install -y docker-ce docker-ce-cli containerd.io
-                          EOF
 
-  tags = {
-    Name     = "mysql"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "mysql",
+      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+    )
+  )
 }
 

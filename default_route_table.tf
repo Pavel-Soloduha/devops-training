@@ -6,11 +6,10 @@
 //resource "aws_default_route_table" "default_rt" {
 //  default_route_table_id = data.aws_route_tables.rts.id
 //
-//  tags = {
-//    Name     = "MainRT"
-//    provider = var.tag_provider
-//    AZ       = "us-east-2a"
-//  }
+//  tags = merge(
+//    var.common_tags,
+//    map(
+//      "Name", "MainRT"
+//    )
+//  )
 //}
-//
-//

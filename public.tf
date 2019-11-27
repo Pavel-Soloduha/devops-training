@@ -12,11 +12,14 @@ resource "aws_subnet" "public" {
   )
   availability_zone = element(data.aws_availability_zones.zones.names, count.index)
 
-  tags = {
-    Name     = "public"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
+
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "public",
+      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+    )
+  )
 }
 
 resource "aws_route_table" "public_rt" {
@@ -27,11 +30,14 @@ resource "aws_route_table" "public_rt" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
-  tags = {
-    Name     = "publicRT"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
+
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "publicRT",
+      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+    )
+  )
 }
 
 resource "aws_route_table_association" "public_rt_route" {
@@ -43,41 +49,47 @@ resource "aws_route_table_association" "public_rt_route" {
 resource "aws_internet_gateway" "gw" {
   vpc_id = data.aws_vpc.vpc_data.id
 
-  tags = {
-    Name     = "gateway"
-    provider = var.tag_provider
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "gateway"
+    )
+  )
 }
 
 resource "aws_instance" "nginx" {
   count                  = local.public_subnet_count
-  ami                    = "ami-0d03add87774b12c5"
+  ami                    = var.default_ami
   instance_type          = "t2.nano"
   subnet_id              = element(aws_subnet.public.*.id, count.index)
-  key_name               = "amazon-key"
+  key_name               = var.access_key
   vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id, aws_security_group.allow-inbound.id]
-  user_data              = file("nginx/nginx.setup")
+//  user_data              = file("nginx/nginx.setup")
 
-  provisioner "file" {
-    source      = "nginx/default.config"
-    destination = "/etc/nginx/conf.d/default.config"
-  }
+//  provisioner "file" {
+//    source      = "nginx/default.config"
+//    destination = "/etc/nginx/conf.d/default.config"
+//  }
 
-  tags = {
-    Name     = "nginx"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "nginx",
+      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+    )
+  )
 }
 
-resource "aws_eip" "nginx_eip" {
-  count    = local.public_subnet_count
-  instance = element(aws_instance.nginx.*.id, count.index)
-  vpc      = true
-
-  tags = {
-    Name     = "nginx ip"
-    provider = var.tag_provider
-    AZ       = element(data.aws_availability_zones.zones.names, count.index)
-  }
-}
+//resource "aws_eip" "nginx_eip" {
+//  count    = local.public_subnet_count
+//  instance = element(aws_instance.nginx.*.id, count.index)
+//  vpc      = true
+//
+//  tags = merge(
+//    var.common_tags,
+//    map(
+//      "Name", "nginx ip",
+//      "AZ", element(data.aws_availability_zones.zones.names, count.index)
+//    )
+//  )
+//}

@@ -8,9 +8,10 @@ resource "aws_subnet" "public" {
   cidr_block = cidrsubnet(
     signum(length(var.cidr)) == 1 ? var.cidr : data.aws_vpc.vpc_data.cidr_block,
     ceil(log(local.public_subnet_count * var.network_layers_count, 2)),
-    count.index
+    count.index + local.backend_subnet_count + local.backend_subnet_count + local.frontend_subnet_count
   )
-  availability_zone = element(data.aws_availability_zones.zones.names, count.index)
+  availability_zone       = element(data.aws_availability_zones.zones.names, count.index)
+  map_public_ip_on_launch = true
 
 
   tags = merge(
@@ -56,40 +57,3 @@ resource "aws_internet_gateway" "gw" {
     )
   )
 }
-
-resource "aws_instance" "nginx" {
-  count                  = local.public_subnet_count
-  ami                    = var.default_ami
-  instance_type          = "t2.nano"
-  subnet_id              = element(aws_subnet.public.*.id, count.index)
-  key_name               = var.access_key
-  vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id, aws_security_group.allow-inbound.id]
-//  user_data              = file("nginx/nginx.setup")
-
-//  provisioner "file" {
-//    source      = "nginx/default.config"
-//    destination = "/etc/nginx/conf.d/default.config"
-//  }
-
-  tags = merge(
-    var.common_tags,
-    map(
-      "Name", "nginx",
-      "AZ", element(data.aws_availability_zones.zones.names, count.index)
-    )
-  )
-}
-
-//resource "aws_eip" "nginx_eip" {
-//  count    = local.public_subnet_count
-//  instance = element(aws_instance.nginx.*.id, count.index)
-//  vpc      = true
-//
-//  tags = merge(
-//    var.common_tags,
-//    map(
-//      "Name", "nginx ip",
-//      "AZ", element(data.aws_availability_zones.zones.names, count.index)
-//    )
-//  )
-//}

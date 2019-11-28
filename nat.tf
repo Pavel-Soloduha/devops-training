@@ -15,17 +15,3 @@ resource "aws_instance" "nat" {
     )
   )
 }
-
-resource "aws_eip" "nat_eip" {
-  count    = local.public_subnet_count
-  instance = element(aws_instance.nat.*.id, count.index)
-  vpc      = true
-
-  tags = merge(
-    var.common_tags,
-    map(
-      "Name", "nat ip",
-      "AZ", element(data.aws_availability_zones.zones.names, count.index)
-    )
-  )
-}

@@ -8,9 +8,10 @@ resource "aws_subnet" "private_db" {
   cidr_block = cidrsubnet(
     signum(length(var.cidr)) == 1 ? var.cidr : data.aws_vpc.vpc_data.cidr_block,
     ceil(log(local.private_subnet_count * var.network_layers_count, 2)),
-    count.index + local.backend_subnet_count + local.backend_subnet_count
+    count.index
   )
-  availability_zone = element(data.aws_availability_zones.zones.names, count.index)
+  map_public_ip_on_launch = false
+  availability_zone       = element(data.aws_availability_zones.zones.names, count.index)
 
   tags = merge(
     var.common_tags,

@@ -14,16 +14,3 @@ resource "aws_instance" "bastion" {
     )
   )
 }
-
-resource "aws_eip" "bastion_eip" {
-  instance = aws_instance.bastion.id
-  vpc      = true
-
-  tags = merge(
-    var.common_tags,
-    map(
-      "Name", "bastion ip",
-      "AZ", "us-east-2a"
-    )
-  )
-}

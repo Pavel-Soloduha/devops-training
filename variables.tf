@@ -7,7 +7,7 @@ variable "tag_provider" {
 }
 
 variable "max_subnet_count" {
-  default = 1
+  default = 2
   type    = number
 }
 
@@ -42,7 +42,7 @@ variable "common_tags" {
 
 variable "default_ami" {
   default = "ami-04763b3055de4860b"
-  type = string
+  type    = string
 }
 
 variable "access_key" {

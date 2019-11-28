@@ -3,12 +3,11 @@ data "aws_route53_zone" "test_zone" {
 }
 
 resource "aws_route53_record" "solodukha" {
-  count   = local.frontend_subnet_count
   zone_id = data.aws_route53_zone.test_zone.zone_id
   name    = "solodukha.${data.aws_route53_zone.test_zone.name}"
   type    = "A"
   ttl     = "300"
-  records = [element(aws_instance.frontend.*.private_ip, count.index)]
+  records = [element(aws_instance.frontend.*.private_ip, 0)]
 }
 
 //resource "aws_lb" "public_frontend_lb" {

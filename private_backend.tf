@@ -31,7 +31,7 @@ resource "aws_route_table_association" "private_rt_route_pb" {
 resource "aws_instance" "backend" {
   count                  = local.backend_subnet_count
   ami                    = var.default_ami
-  instance_type          = "t2.nano"
+  instance_type          = "t2.micro"
   subnet_id              = element(aws_subnet.private_backend.*.id, count.index)
   key_name               = var.access_key
   vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id]

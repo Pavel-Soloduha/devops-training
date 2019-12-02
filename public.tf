@@ -13,7 +13,6 @@ resource "aws_subnet" "public" {
   availability_zone       = element(data.aws_availability_zones.zones.names, count.index)
   map_public_ip_on_launch = true
 
-
   tags = merge(
     var.common_tags,
     map(

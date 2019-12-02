@@ -11,7 +11,7 @@ resource "aws_subnet" "private_frontend" {
     count.index + local.private_subnet_count + local.backend_subnet_count
   )
   availability_zone       = element(data.aws_availability_zones.zones.names, count.index)
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = merge(
     var.common_tags,

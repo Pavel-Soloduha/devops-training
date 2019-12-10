@@ -40,7 +40,7 @@ resource "aws_instance" "jenkins" {
 resource "aws_lb_listener_rule" "jenkins_lb_rule" {
   listener_arn = aws_lb_listener.alb-default-listener.arn
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.jenkins_target.arn
   }
   condition {
@@ -67,10 +67,10 @@ resource "aws_lb_target_group" "jenkins_target" {
 }
 
 resource "aws_lb_target_group_attachment" "jenkins_target_attachment" {
-  count = var.infra_subnets_count
+  count            = var.infra_subnets_count
   target_group_arn = aws_lb_target_group.jenkins_target.arn
-  target_id = element(aws_instance.jenkins.*.id, count.index)
-  port = 80
+  target_id        = element(aws_instance.jenkins.*.id, count.index)
+  port             = 80
 }
 
 //resource "aws_instance" "sonar-qube" {

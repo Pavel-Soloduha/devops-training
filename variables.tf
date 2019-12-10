@@ -24,9 +24,35 @@ variable "AZ" {
   }
 }
 
-variable "network_layers_count" {
+variable "aval_zones_count" {
   type    = number
-  default = 3
+  default = 2
+}
+
+variable "infra_subnets_count" {
+  type    = number
+  default = 1
+}
+
+variable "backend_subnets_count" {
+  type    = number
+  default = 2
+}
+
+variable "frontend_subnets_count" {
+  type    = number
+  default = 2
+}
+
+variable "public_subnets_count" {
+  type    = number
+  default = 2
+}
+
+variable "subnets_count" {
+  type = number
+  //  default = var.infra_subnets_count + var.backend_subnets_count + var.frontend_subnets_count + var.public_subnets_count
+  default = 7
 }
 
 variable "common_tags" {

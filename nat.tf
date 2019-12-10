@@ -1,5 +1,5 @@
 resource "aws_instance" "nat" {
-  count                  = local.public_subnet_count
+  count                  = var.public_subnets_count
   ami                    = "ami-00a9d4a05375b2763"
   instance_type          = "t2.nano"
   subnet_id              = element(aws_subnet.public.*.id, count.index)
@@ -10,7 +10,7 @@ resource "aws_instance" "nat" {
   tags = merge(
     var.common_tags,
     map(
-      "Name", "NAT",
+      "Name", "NAT-${element(data.aws_availability_zones.zones.names, count.index)}",
       "AZ", element(data.aws_availability_zones.zones.names, count.index)
     )
   )

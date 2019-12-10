@@ -1,7 +1,7 @@
 resource "aws_subnet" "private_infra" {
   count                   = var.infra_subnets_count
-  vpc_id                  = data.aws_vpc.vpc_data.id
-  cidr_block              = cidrsubnet(data.aws_vpc.vpc_data.cidr_block, ceil(log(var.subnets_count, 2)), count.index)
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = cidrsubnet(aws_vpc.vpc.cidr_block, ceil(log(var.subnets_count, 2)), count.index)
   map_public_ip_on_launch = false
   availability_zone       = element(data.aws_availability_zones.zones.names, count.index)
 
@@ -35,6 +35,42 @@ resource "aws_instance" "jenkins" {
       "AZ", element(data.aws_availability_zones.zones.names, count.index)
     )
   )
+}
+
+resource "aws_lb_listener_rule" "jenkins_lb_rule" {
+  listener_arn = aws_lb_listener.alb-default-listener.arn
+  action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.jenkins_target.arn
+  }
+  condition {
+    field  = "host-header"
+    values = ["jenkins.*"]
+  }
+}
+
+resource "aws_lb_target_group" "jenkins_target" {
+  name     = "solodukha-jenkins-target"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.vpc.id
+
+  tags = merge(
+    var.common_tags
+  )
+
+  health_check {
+    enabled = true
+    timeout = 10
+    matcher = "200-499"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "jenkins_target_attachment" {
+  count = var.infra_subnets_count
+  target_group_arn = aws_lb_target_group.jenkins_target.arn
+  target_id = element(aws_instance.jenkins.*.id, count.index)
+  port = 80
 }
 
 //resource "aws_instance" "sonar-qube" {

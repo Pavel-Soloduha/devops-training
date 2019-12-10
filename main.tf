@@ -16,16 +16,16 @@ resource "aws_vpc" "vpc" {
   )
 }
 
-data "aws_vpc" "vpc_data" {
-  id = aws_vpc.vpc.id
-}
+//data "aws_vpc" "vpc_data" {
+//  id = aws_vpc.vpc.id
+//}
 
 data "aws_availability_zones" "zones" {
 }
 
 resource "aws_route_table" "public_rt" {
   count  = var.aval_zones_count
-  vpc_id = data.aws_vpc.vpc_data.id
+  vpc_id = aws_vpc.vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -43,7 +43,7 @@ resource "aws_route_table" "public_rt" {
 
 resource "aws_route_table" "private_rt" {
   count  = var.aval_zones_count
-  vpc_id = data.aws_vpc.vpc_data.id
+  vpc_id = aws_vpc.vpc.id
 
   route {
     cidr_block  = "0.0.0.0/0"

@@ -2,7 +2,7 @@
 resource "aws_security_group" "allow-ssh" {
   name        = "allow-ssh"
   description = "Allow SSH inbound traffic"
-  vpc_id      = data.aws_vpc.vpc_data.id
+  vpc_id      = aws_vpc.vpc.id
 
   ingress {
     from_port = 22
@@ -21,7 +21,7 @@ resource "aws_security_group" "allow-ssh" {
 resource "aws_security_group" "allow-vpc-traffic" {
   name        = "allow-vpc-traffic"
   description = "Allow all inner VPC traffic"
-  vpc_id      = data.aws_vpc.vpc_data.id
+  vpc_id      = aws_vpc.vpc.id
 
   ingress {
     from_port = 0
@@ -54,7 +54,7 @@ resource "aws_security_group" "allow-vpc-traffic" {
 resource "aws_security_group" "allow-inbound" {
   name        = "allow-inbound"
   description = "Allow 80/443 inbound traffic"
-  vpc_id      = data.aws_vpc.vpc_data.id
+  vpc_id      = aws_vpc.vpc.id
 
   ingress {
     from_port = 80

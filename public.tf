@@ -1,8 +1,8 @@
 resource "aws_subnet" "public" {
   count  = var.public_subnets_count
-  vpc_id = data.aws_vpc.vpc_data.id
+  vpc_id = aws_vpc.vpc.id
   cidr_block = cidrsubnet(
-    signum(length(var.cidr)) == 1 ? var.cidr : data.aws_vpc.vpc_data.cidr_block,
+    signum(length(var.cidr)) == 1 ? var.cidr : aws_vpc.vpc.cidr_block,
     ceil(log(var.subnets_count, 2)),
     count.index + var.infra_subnets_count + var.backend_subnets_count + var.frontend_subnets_count
   )
@@ -25,7 +25,7 @@ resource "aws_route_table_association" "public_rt_route" {
 }
 
 resource "aws_internet_gateway" "gw" {
-  vpc_id = data.aws_vpc.vpc_data.id
+  vpc_id = aws_vpc.vpc.id
 
   tags = merge(
     var.common_tags,

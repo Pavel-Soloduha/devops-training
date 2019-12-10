@@ -19,3 +19,5 @@ variable "subnet_ids" {}
 variable "sec_groups_id" {}
 
 variable "env_tag" {}
+
+variable "alb-listener-arn" {}

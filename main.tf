@@ -69,5 +69,6 @@ module "application_infra" {
   vpc_id                = aws_vpc.vpc.id
   subnet_ids            = [aws_subnet.private_backend.*.id[0], aws_subnet.private_backend.*.id[1]]
   sec_groups_id         = aws_security_group.allow-vpc-traffic.id
-  env_tag               = "Dev"
+  env_tag               = "dev"
+  alb-listener-arn      = aws_lb_listener.alb-default-listener.arn
 }

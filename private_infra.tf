@@ -1,14 +1,9 @@
-locals {
-  private_subnet_count = var.max_subnet_count == 0 ? length(data.aws_availability_zones.zones.names) : var.max_subnet_count
-}
-
-resource "aws_subnet" "private_db" {
-  count  = local.private_subnet_count
+resource "aws_subnet" "private_infra" {
   vpc_id = data.aws_vpc.vpc_data.id
   cidr_block = cidrsubnet(
     signum(length(var.cidr)) == 1 ? var.cidr : data.aws_vpc.vpc_data.cidr_block,
     ceil(log(local.private_subnet_count * var.network_layers_count, 2)),
-    count.index
+    1
   )
   map_public_ip_on_launch = false
   availability_zone       = element(data.aws_availability_zones.zones.names, count.index)

@@ -12,10 +12,12 @@ resource "aws_security_group" "allow-ssh" {
     "0.0.0.0/0"]
   }
 
-  tags = {
-    Name     = "allow-ssh"
-    provider = var.tag_provider
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "allow-ssh"
+    )
+  )
 }
 
 resource "aws_security_group" "allow-vpc-traffic" {
@@ -45,10 +47,12 @@ resource "aws_security_group" "allow-vpc-traffic" {
     "0.0.0.0/0"]
   }
 
-  tags = {
-    Name     = "allow-vpc-traffic"
-    provider = var.tag_provider
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "allow-vpc-traffic"
+    )
+  )
 }
 
 resource "aws_security_group" "allow-inbound" {
@@ -85,8 +89,10 @@ resource "aws_security_group" "allow-inbound" {
     "0.0.0.0/0"]
   }
 
-  tags = {
-    Name     = "allow-inbound"
-    provider = var.tag_provider
-  }
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "allow-inbound"
+    )
+  )
 }

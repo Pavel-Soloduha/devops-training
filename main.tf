@@ -58,3 +58,16 @@ resource "aws_route_table" "private_rt" {
     )
   )
 }
+
+module "application_infra" {
+  source = "./project_infra"
+
+  access_key            = var.access_key
+  backend_subnets_count = var.backend_subnets_count
+  common_tags           = var.common_tags
+  default_ami           = var.default_ami
+  vpc_id                = aws_vpc.vpc.id
+  subnet_ids            = [aws_subnet.private_backend.*.id[0], aws_subnet.private_backend.*.id[1]]
+  sec_groups_id         = aws_security_group.allow-vpc-traffic.id
+  env_tag               = "Dev"
+}

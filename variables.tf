@@ -58,11 +58,10 @@ variable "subnets_count" {
 variable "common_tags" {
   type = map(string)
   default = {
-    "coherent:owner"       = "pavelsolodukha@coherentsolutions.com"
-    "coherent:client"      = "Coherent"
-    "coherent:project"     = "devops-training"
-    "coherent:environment" = "Dev"
-    "provider"             = "terraform"
+    "coherent:owner"   = "pavelsolodukha@coherentsolutions.com"
+    "coherent:client"  = "Coherent"
+    "coherent:project" = "devops-training"
+    "provider"         = "terraform"
   }
 }
 

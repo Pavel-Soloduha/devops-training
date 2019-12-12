@@ -59,16 +59,38 @@ resource "aws_route_table" "private_rt" {
   )
 }
 
-module "application_infra" {
-  source = "./project_infra"
+module "application_dev_infrastructure" {
+  source = "./app_infrastructure"
 
-  access_key            = var.access_key
-  backend_subnets_count = var.backend_subnets_count
-  common_tags           = var.common_tags
-  default_ami           = var.default_ami
-  vpc_id                = aws_vpc.vpc.id
-  subnet_ids            = [aws_subnet.private_backend.*.id[0], aws_subnet.private_backend.*.id[1]]
-  sec_groups_id         = aws_security_group.allow-vpc-traffic.id
-  env_tag               = "dev"
-  alb-listener-arn      = aws_lb_listener.alb-default-listener.arn
+  access_key                = var.access_key
+  backend_subnets_count     = var.backend_subnets_count
+  common_tags               = var.common_tags
+  default_ami               = var.default_ami
+  vpc_id                    = aws_vpc.vpc.id
+  pb_subnet_ids             = [aws_subnet.private_backend.*.id[0], aws_subnet.private_backend.*.id[1]]
+  vpc_traffic_sec_groups_id = aws_security_group.allow-vpc-traffic.id
+  inbound_sec_groups_id     = aws_security_group.allow-inbound.id
+  ssh_sec_groups_id         = aws_security_group.allow-ssh.id
+  env_tag                   = "dev"
+  alb-listener-arn          = aws_lb_listener.alb-default-listener.arn
+  frontend_subnets_count    = var.frontend_subnets_count
+  pf_subnet_ids             = [aws_subnet.private_frontend.*.id[0], aws_subnet.private_frontend.*.id[1]]
+}
+
+module "application_prod_infrastructure" {
+  source = "./app_infrastructure"
+
+  access_key                = var.access_key
+  backend_subnets_count     = var.backend_subnets_count
+  common_tags               = var.common_tags
+  default_ami               = var.default_ami
+  vpc_id                    = aws_vpc.vpc.id
+  pb_subnet_ids             = [aws_subnet.private_backend.*.id[0], aws_subnet.private_backend.*.id[1]]
+  vpc_traffic_sec_groups_id = aws_security_group.allow-vpc-traffic.id
+  inbound_sec_groups_id     = aws_security_group.allow-inbound.id
+  ssh_sec_groups_id         = aws_security_group.allow-ssh.id
+  env_tag                   = "prod"
+  alb-listener-arn          = aws_lb_listener.alb-default-listener.arn
+  frontend_subnets_count    = var.frontend_subnets_count
+  pf_subnet_ids             = [aws_subnet.private_frontend.*.id[0], aws_subnet.private_frontend.*.id[1]]
 }

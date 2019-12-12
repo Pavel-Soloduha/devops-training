@@ -4,9 +4,9 @@ resource "aws_instance" "backend" {
   count                  = var.backend_subnets_count
   ami                    = var.default_ami
   instance_type          = "t2.micro"
-  subnet_id              = element(var.subnet_ids, count.index)
+  subnet_id              = element(var.pb_subnet_ids, count.index)
   key_name               = var.access_key
-  vpc_security_group_ids = [var.sec_groups_id]
+  vpc_security_group_ids = [var.vpc_traffic_sec_groups_id]
 
   tags = merge(
     var.common_tags,
@@ -43,6 +43,7 @@ resource "aws_lb_target_group" "backend_target" {
     path     = "/tags"
   }
 }
+
 resource "aws_lb_target_group_attachment" "alb-be-attachment" {
   count            = var.backend_subnets_count
   target_group_arn = aws_lb_target_group.backend_target.arn

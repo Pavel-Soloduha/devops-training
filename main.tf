@@ -16,10 +16,6 @@ resource "aws_vpc" "vpc" {
   )
 }
 
-//data "aws_vpc" "vpc_data" {
-//  id = aws_vpc.vpc.id
-//}
-
 data "aws_availability_zones" "zones" {
 }
 

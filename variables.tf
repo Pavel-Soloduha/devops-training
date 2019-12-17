@@ -61,7 +61,6 @@ variable "common_tags" {
     "coherent:owner"   = "pavelsolodukha@coherentsolutions.com"
     "coherent:client"  = "Coherent"
     "coherent:project" = "devops-training"
-    "provider"         = "terraform"
   }
 }
 

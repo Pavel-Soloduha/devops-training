@@ -9,7 +9,8 @@ resource "aws_instance" "bastion" {
   tags = merge(
     var.common_tags,
     map(
-      "Name", "Bastion",
+      "Name", "Bastion-us-east-2a",
+      "app-type", "bastion",
       "AZ", "us-east-2a"
     )
   )

@@ -12,6 +12,8 @@ resource "aws_instance" "frontend" {
     var.common_tags,
     map(
       "Name", "Frontend-${var.env_tag}-${element(data.aws_availability_zones.zones.names, count.index)}",
+      "coherent:environment", var.env_tag,
+      "app-type", "frontend",
       "AZ", element(data.aws_availability_zones.zones.names, count.index)
     )
   )

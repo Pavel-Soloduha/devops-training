@@ -40,6 +40,7 @@ resource "aws_instance" "jenkins" {
     var.common_tags,
     map(
       "Name", "Jenkins-${element(data.aws_availability_zones.zones.names, count.index)}",
+      "app-type", "ci_cd",
       "AZ", element(data.aws_availability_zones.zones.names, count.index)
     )
   )
@@ -141,6 +142,7 @@ resource "aws_instance" "nexus" {
     var.common_tags,
     map(
       "Name", "Nexus- ${element(data.aws_availability_zones.zones.names, count.index)}",
+      "app-type", "nexus",
       "AZ", element(data.aws_availability_zones.zones.names, 0)
     )
   )

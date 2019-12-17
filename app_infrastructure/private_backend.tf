@@ -13,6 +13,7 @@ resource "aws_instance" "backend" {
     map(
       "Name", "Backend-${var.env_tag}-${element(data.aws_availability_zones.zones.names, count.index)}",
       "coherent:environment", var.env_tag,
+      "app-type", "backend",
       "AZ", element(data.aws_availability_zones.zones.names, count.index)
     )
   )

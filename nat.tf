@@ -11,6 +11,7 @@ resource "aws_instance" "nat" {
     var.common_tags,
     map(
       "Name", "NAT-${element(data.aws_availability_zones.zones.names, count.index)}",
+      "app-type", "nat",
       "AZ", element(data.aws_availability_zones.zones.names, count.index)
     )
   )

@@ -71,6 +71,8 @@ module "application_dev_infrastructure" {
   alb-listener-arn          = aws_lb_listener.alb-default-listener.arn
   frontend_subnets_count    = var.frontend_subnets_count
   pf_subnet_ids             = [aws_subnet.private_frontend.*.id[0], aws_subnet.private_frontend.*.id[1]]
+  aws_lb_dns_name           = aws_lb.alb.dns_name
+  aws_route53_zone_id       = data.aws_route53_zone.test_zone.id
 }
 
 module "application_prod_infrastructure" {
@@ -89,4 +91,6 @@ module "application_prod_infrastructure" {
   alb-listener-arn          = aws_lb_listener.alb-default-listener.arn
   frontend_subnets_count    = var.frontend_subnets_count
   pf_subnet_ids             = [aws_subnet.private_frontend.*.id[0], aws_subnet.private_frontend.*.id[1]]
+  aws_lb_dns_name           = aws_lb.alb.dns_name
+  aws_route53_zone_id       = data.aws_route53_zone.test_zone.id
 }

@@ -17,15 +17,23 @@ resource "aws_instance" "frontend" {
   )
 }
 
+resource "aws_route53_record" "forntend-route53" {
+  zone_id = var.aws_route53_zone_id
+  name    = "front-${var.env_tag}-solodukha.test.coherentprojects.net"
+  type    = "CNAME"
+  ttl     = "60"
+  records = [var.aws_lb_dns_name]
+}
+
 resource "aws_lb_listener_rule" "frontend_lb_rule" {
   listener_arn = var.alb-listener-arn
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.frontend-target.arn
   }
   condition {
     field  = "host-header"
-    values = ["front.${var.env_tag}.*"]
+    values = ["front-${var.env_tag}-solodukha.*"]
   }
 }
 

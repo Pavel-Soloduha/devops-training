@@ -18,6 +18,14 @@ resource "aws_instance" "backend" {
   )
 }
 
+resource "aws_route53_record" "backend-route53" {
+  zone_id = var.aws_route53_zone_id
+  name    = "back-${var.env_tag}-solodukha.test.coherentprojects.net"
+  type    = "CNAME"
+  ttl     = "60"
+  records = [var.aws_lb_dns_name]
+}
+
 resource "aws_lb_listener_rule" "backend_lb_rule" {
   listener_arn = var.alb-listener-arn
   action {
@@ -26,7 +34,7 @@ resource "aws_lb_listener_rule" "backend_lb_rule" {
   }
   condition {
     field  = "host-header"
-    values = ["back.${var.env_tag}.*"]
+    values = ["back-${var.env_tag}-solodukha.*"]
   }
 }
 

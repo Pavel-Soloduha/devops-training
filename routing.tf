@@ -2,13 +2,13 @@ data "aws_route53_zone" "test_zone" {
   zone_id = "Z3W2C0CZ94DL4Z"
 }
 
-resource "aws_route53_record" "route53" {
-  zone_id = data.aws_route53_zone.test_zone.id
-  name    = "*.terraform.solodukha.test.coherentprojects.net"
-  type    = "CNAME"
-  ttl     = "60"
-  records = [aws_lb.alb.dns_name]
-}
+//resource "aws_route53_record" "route53" {
+//  zone_id = data.aws_route53_zone.test_zone.id
+//  name    = "*.terraform.solodukha.test.coherentprojects.net"
+//  type    = "CNAME"
+//  ttl     = "60"
+//  records = [aws_lb.alb.dns_name]
+//}
 
 resource aws_lb "alb" {
   name               = "alb-solodukha"
@@ -37,3 +37,18 @@ resource "aws_lb_listener" "alb-default-listener" {
   }
 }
 
+resource "aws_lb_listener" "alb-redirect-listener" {
+  load_balancer_arn = aws_lb.alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}

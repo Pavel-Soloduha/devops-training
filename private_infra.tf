@@ -20,6 +20,14 @@ resource "aws_route_table_association" "private_rt_route_db" {
   route_table_id = element(aws_route_table.private_rt.*.id, count.index)
 }
 
+resource "aws_route53_record" "jenkins-route53" {
+  zone_id = data.aws_route53_zone.test_zone.id
+  name    = "jenkins-solodukha.test.coherentprojects.net"
+  type    = "CNAME"
+  ttl     = "60"
+  records = [aws_lb.alb.dns_name]
+}
+
 resource "aws_instance" "jenkins" {
   count                  = var.infra_subnets_count
   ami                    = var.default_ami
@@ -45,7 +53,7 @@ resource "aws_lb_listener_rule" "jenkins_lb_rule" {
   }
   condition {
     field  = "host-header"
-    values = ["jenkins.*"]
+    values = ["jenkins-solodukha.*"]
   }
 }
 
@@ -121,18 +129,63 @@ resource "aws_lb_target_group_attachment" "jenkins_target_attachment" {
 //  )
 //}
 
-//resource "aws_instance" "nexus" {
-//  ami =  var.default_ami
-//  instance_type = "c5.xlarge"
-//  subnet_id = aws_subnet.public.*.id[0]
-//  key_name = var.access_key
-//  vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id, aws_security_group.allow-inbound.id]
-//
-//  tags = merge(
-//  var.common_tags,
-//  map(
-//  "Name", "nexus",
-//  "AZ", element(data.aws_availability_zones.zones.names, 0)
-//  )
-//  )
-//}
+resource "aws_instance" "nexus" {
+  count                  = var.infra_subnets_count
+  ami                    = var.default_ami
+  instance_type          = "c5.xlarge"
+  subnet_id              = aws_subnet.private_infra.*.id[0]
+  key_name               = var.access_key
+  vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id, aws_security_group.allow-inbound.id]
+
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "Nexus- ${element(data.aws_availability_zones.zones.names, count.index)}",
+      "AZ", element(data.aws_availability_zones.zones.names, 0)
+    )
+  )
+}
+
+resource "aws_route53_record" "nexus-route53" {
+  zone_id = data.aws_route53_zone.test_zone.id
+  name    = "nexus-solodukha.test.coherentprojects.net"
+  type    = "CNAME"
+  ttl     = "60"
+  records = [aws_lb.alb.dns_name]
+}
+
+resource "aws_lb_listener_rule" "nexus_lb_rule" {
+  listener_arn = aws_lb_listener.alb-default-listener.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.nexus_target.arn
+  }
+  condition {
+    field  = "host-header"
+    values = ["nexus-solodukha.*"]
+  }
+}
+
+resource "aws_lb_target_group" "nexus_target" {
+  name     = "solodukha-nexus-target"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.vpc.id
+
+  tags = merge(
+    var.common_tags
+  )
+
+  health_check {
+    enabled = true
+    timeout = 10
+    matcher = "200-499"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "jenkins_nexus_attachment" {
+  count            = var.infra_subnets_count
+  target_group_arn = aws_lb_target_group.nexus_target.arn
+  target_id        = element(aws_instance.nexus.*.id, count.index)
+  port             = 80
+}

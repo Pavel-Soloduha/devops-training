@@ -1,0 +1,7 @@
+---
+- hosts: app:prod:front
+  remote_user: ubuntu
+
+  tasks:
+  - name: ping servers
+    ping:

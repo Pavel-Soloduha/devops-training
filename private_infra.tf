@@ -318,3 +318,21 @@ resource "aws_lb_target_group_attachment" "rundeck_target_attachment" {
   target_id        = element(aws_instance.rundeck.*.id, count.index)
   port             = 80
 }
+
+resource "aws_instance" "ansible" {
+  count                  = var.infra_subnets_count
+  ami                    = var.default_ami
+  instance_type          = "t2.small"
+  subnet_id              = aws_subnet.private_infra.*.id[0]
+  key_name               = var.access_key
+  vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id]
+
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "Ansible-${element(data.aws_availability_zones.zones.names, count.index)}",
+      "app-type", "ansible",
+      "AZ", element(data.aws_availability_zones.zones.names, 0)
+    )
+  )
+}

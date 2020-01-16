@@ -40,7 +40,7 @@ resource "aws_lb_listener_rule" "backend_lb_rule" {
 }
 
 resource "aws_lb_target_group" "backend_target" {
-  name        = "backend-target-${var.env_tag}"
+  name        = "solodukha-backend-target-${var.env_tag}"
   port        = 8080
   protocol    = "HTTP"
   vpc_id      = var.vpc_id

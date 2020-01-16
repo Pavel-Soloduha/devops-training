@@ -11,7 +11,7 @@ resource "aws_vpc" "vpc" {
   tags = merge(
     var.common_tags,
     map(
-      "Name", "vpc-solodukha"
+      "Name", "solodukha-vpc"
     )
   )
 }

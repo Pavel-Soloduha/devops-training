@@ -40,7 +40,7 @@ resource "aws_lb_listener_rule" "frontend_lb_rule" {
 }
 
 resource "aws_lb_target_group" "frontend-target" {
-  name        = "frontend-target-${var.env_tag}"
+  name        = "solodukha-frontend-target-${var.env_tag}"
   port        = 5000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id

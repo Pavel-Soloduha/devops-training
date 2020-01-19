@@ -6,7 +6,7 @@
     - name: Test
       command: touch /home/ubuntu/artifacts/test.file
     - name: Install python3
-      become: true
+      become: yes
       command: apt install python3 -y
     - name: Download pip
       command: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
@@ -15,7 +15,7 @@
     - name: install all dependencies
       command: python3 -m pip install -I lxml --user
     - name: install java
-      become: true
+      become: yes
       apt:
         update_cache: yes
         name: openjdk-8-jre

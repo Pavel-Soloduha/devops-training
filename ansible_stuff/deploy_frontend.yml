@@ -23,11 +23,12 @@
     maven_artifact:
       artifact_id: devops-training-backend
       dest: /home/ubuntu/artifacts
-      extension: jar
+      extension: tar
       group_id: by.brest.project
       password: "{{ nexus_password }}"
-      repository_url: "https://nexus-solodukha.test.coherentprojects.net/repository/devops"
+      repository_url: "https://nexus-solodukha.test.coherentprojects.net/repository/training"
       username: "{{ nexus_username }}"
+      classifier: "{{ nexus_classifier }}"
       version: 36
   - name: Start application
     shell: nohup java -jar ./artifacts/devops-training-backend-36.jar &

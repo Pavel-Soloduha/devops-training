@@ -29,7 +29,11 @@
         repository_url: "https://nexus-solodukha.test.coherentprojects.net/repository/training"
         username: "{{ nexus_username }}"
         version: "{{ artifact_version }}"
+    - name: Find working application PID
+      shell: ps -au | grep "java -jar" | grep -v "grep" | grep -P -o "[[:digit:]]*" | head -n 1
+      register: app_pid
     - name: Stop previous application
-      shell: kill $(ps -au | grep "java -jar" | grep -v "grep" | grep -P -o "[[:digit:]]*" | head -n 1)
+      shell: kill app_pid
+      when: app_pid.stdout != ""
     - name: Start application
-      shell: nohup java -jar ./artifacts/devops-training-backend-"{{ artifact_version }}".jar &
+      shell: nohup java -jar ./artifacts/devops-training-backend-{{ artifact_version }}.jar &

@@ -51,6 +51,13 @@ resource "aws_lb_target_group" "backend_target" {
     interval = 10
     path     = "/tags"
   }
+
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "solodukha-backend-target"
+    )
+  )
 }
 
 resource "aws_lb_target_group_attachment" "alb-be-attachment" {

@@ -51,6 +51,13 @@ resource "aws_lb_target_group" "frontend-target" {
     path     = "/"
     interval = 10
   }
+
+  tags = merge(
+    var.common_tags,
+    map(
+      "Name", "solodukha-frontend-target"
+    )
+  )
 }
 
 resource "aws_lb_target_group_attachment" "alb-fe-attachment" {

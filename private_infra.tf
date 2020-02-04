@@ -88,7 +88,7 @@ resource "aws_lb_target_group_attachment" "jenkins_target_attachment" {
 resource "aws_instance" "nexus" {
   count                  = var.infra_subnets_count
   ami                    = var.default_ami
-  instance_type          = "a1.xlarge"
+  instance_type          = "c5.xlarge"
   subnet_id              = aws_subnet.private_infra.*.id[0]
   key_name               = var.access_key
   vpc_security_group_ids = [aws_security_group.allow-vpc-traffic.id, aws_security_group.allow-inbound.id]

@@ -30,12 +30,11 @@
     maven_artifact:
       artifact_id: devops-training-frontend
       dest: /home/ubuntu
-      extension: tar.gz
+      extension: tar
       group_id: by.brest.project
       password: "{{ nexus_password }}"
       repository_url: "https://nexus-solodukha.test.coherentprojects.net/repository/training"
       username: "{{ nexus_username }}"
-      classifier: "{{ artifact_classifier }}"
       version: "{{ artifact_version }}"
   - name: Find working application PID
     shell: ps -au | grep "node" | grep -v "grep" | grep -P -o "[[:digit:]]*" | head -n 1
@@ -46,6 +45,6 @@
   - name: Clean
     shell: rm -rf ./build
   - name: Prepare
-    shell: tar -xf devops-training-frontend-{{ artifact_version }}-{{artifact_classifier }}.tar.gz
+    shell: tar -xf devops-training-frontend-{{ artifact_version }}.tar
   - name: Start application
     shell: nohup serve -s ./build &

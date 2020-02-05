@@ -3,6 +3,8 @@
   remote_user: ubuntu
 
   tasks:
+    - name: mkdir
+      command: mkdir -p /home/ubuntu/artifacts
     - name: Test
       command: touch /home/ubuntu/artifacts/test.file
     - name: Install python3
